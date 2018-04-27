@@ -15,7 +15,6 @@ data_root = "/home/philip/data/Keyword_spot/"
 def get_label_from_filename(full_filename):
     dirname = os.path.dirname(full_filename)
     label = dirname.split("/")[-1]
-#     print(dirname,label)
     label_indice = class_indices[label]
     one_hot_encode = keras.utils.to_categorical(
         label_indice, len(class_indices))
@@ -35,7 +34,7 @@ records = [read_record(_) for _ in record_file]
 
 
 def gather_data(file_name):
-#     file_name = os.path.basename(file_name)
+    #     file_name = os.path.basename(file_name)
     gather_record = np.array([record[file_name] for record in records])
     label = get_label_from_filename(file_name)
     return gather_record, label
