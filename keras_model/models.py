@@ -13,8 +13,7 @@ conv_filter = [8, 16, 32, 64, 128, 256]
 
 
 class Model(object):
-    def __init__(self, class_num, RNN_repeat=2, RNN_layer=GRU, attention=False):
-        self.class_num = class_num
+    def __init__(self, RNN_repeat=2, RNN_layer=GRU, attention=False):
         self.RNN_layer = RNN_layer
         self.RNN_repeat = RNN_repeat
         self.attention = attention
@@ -52,9 +51,8 @@ class ResNetModel(Model):
         for i in range(self.RNN_repeat):
             x = Bidirectional(
                 self.RNN_layer(conv_filter[-1], return_sequences=True), merge_mode='ave')(x)
-        x = GlobalMaxPooling1D()(x)
-        output_layer = Dense(self.class_num, activation='softmax')(x)
-        return output_layer
+        pre_logits = GlobalMaxPooling1D()(x)
+        return pre_logits
 
 
 class InceptNetModel(Model):
@@ -79,6 +77,5 @@ class InceptNetModel(Model):
         for i in range(RNN_repeat):
             x = Bidirectional(
                 self.RNN_layer(conv_filter[-1], return_sequences=True), merge_mode='ave')(x)
-        x = GlobalAveragePooling1D()(x)
-        output_layer = Dense(self.class_num, activation='softmax')(x)
-        return output_layer
+        pre_logits = GlobalMaxPooling1D()(x)
+        return pre_logits

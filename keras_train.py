@@ -3,7 +3,7 @@ import argparse
 from pathlib import Path
 from keras_model.models import ResNetModel, InceptNetModel
 from keras.preprocessing import image
-from keras.layers import Input
+from keras.layers import Input, Dense
 from config import training_img_data_folder
 # parse argument
 parser = argparse.ArgumentParser()
@@ -25,8 +25,10 @@ training_gen = training_data_gen.flow_from_directory(training_img_data_folder, c
                                                      color_mode="grayscale")
 # construct model
 input_layer = Input((128, 63, 1))
-resnet = ResNetModel(class_num=training_gen.num_classes)
-output_layer = resnet.build(input_layer)
+resnet = ResNetModel()
+pre_logits = resnet.build(input_layer)
+output_layer = Dense(training_gen.num_classes,
+                     activation='softmax')(pre_logits)
 model = keras.models.Model(input_layer, output_layer)
 # config model on optimizer, metirc and loss function
 sgd = lambda learning_rate: keras.optimizers.SGD(
