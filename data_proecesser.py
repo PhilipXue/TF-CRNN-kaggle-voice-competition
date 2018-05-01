@@ -6,24 +6,18 @@ import functools
 from pathlib import Path
 import cv2
 import tqdm
-from config import data_root, audio_data_folder, img_data_folder, all_audio_data
-
-
-@functools.lru_cache()
-def _load_audio(audio_file_name):
-    y, sr = librosa.load(audio_file_name, sr=None)
-    return y, sr
+from config import (data_root, training_audio_data_folder,
+                    training_img_data_folder, test_audio_data)
 
 
 def audio_file_to_mel_spectrum(audio_file_name, hop_length=512, sr=22050):
-    y, ori_sr = _load_audio(audio_file_name)
+    '''
+    Get an audio fiel its file name and convert it into two dimensions np array
+    '''
+    y, ori_sr = librosa.load(audio_file_name, sr=None)
     y = librosa.core.resample(cut_y, orig_sr=ori_sr, target_sr=sr)
     mel = librosa.feature.melspectrogram(
         y=y, sr=sr, hop_length=hop_length)
-    return mel
-
-
-def mel_to_db(mel):
     db = librosa.power_to_db(mel, ref=np.min)
     db -= db.min()
     db *= 255 / (db.max()**(db.max() != 0))
@@ -32,22 +26,22 @@ def mel_to_db(mel):
     return db
 
 
-def audio_filename_to_img_filename(audio_file_name):
-    category = audio_file_name.parent.name
-    img_file = audio_file_name.name.replace('.wav', '.jpg')
-    img_category_folder = img_data_folder / category
-    if not img_folder.exists():
-        os.mkdir(img_category_folder)
-    img_filename = img_category_folder / img_file
-    return img_filename
-
-
-def process_and_save(all_audio_files):
-    for audio_file in tqdm.tqdm(all_audio_files):
-        mel = audio_file_to_mel_spectrum(audio_file)
-        db_img = mel_to_db(mel)
-        cv2.imwrite(audio_filename_to_img_filename(audio_file), db_img)
+def process_data_and_save(audio_files, training):
+    for audio_file_name in tqdm.tqdm(audio_files):
+        db_img = audio_file_to_mel_spectrum(audio_file_name)
+        # convert audio file name to the corresponding image file name
+        img_file = audio_file_name.name.replace('.wav', '.jpg')
+        if training:
+            category = audio_file_name.parent.name
+            img_category_folder = training_img_data_folder / category
+            if not img_folder.exists():
+                os.mkdir(img_category_folder)
+        else:
+            img_category_folder = test_image_data_folder
+        img_filename = img_category_folder / img_file
+        cv2.imwrite(img_filename, db_img)
 
 
 if __name__ == '__main__':
-    process_and_save(all_audio_files=all_audio_data)
+    process_data_and_save(audio_files=training_audio_data, training=True)
+    process_data_and_save(audio_files=test_audio_data, training=False)
