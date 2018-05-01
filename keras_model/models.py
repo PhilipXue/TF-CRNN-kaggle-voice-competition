@@ -17,6 +17,7 @@ class Model(object):
         self.class_num = class_num
         self.RNN_layer = RNN_layer
         self.RNN_repeat = RNN_repeat
+        self.attention = attention
 
     def build(self, input_layer):
         pass
@@ -43,12 +44,12 @@ class ResNetModel(Model):
         x = BatchNormalization()(x)
         x = MaxPool2D((2, 1))(x)
         x = Reshape((63, conv_filter[-1]))(x)
-        if attention:
+        if self.attention:
             y = Permute((2, 1))(x)
             x = Dense(63, activation='softmax')(y)
             x = Multiply()([y, x])
             x = Permute((2, 1))(x)
-        for i in range(RNN_repeat):
+        for i in range(self.RNN_repeat):
             x = Bidirectional(
                 self.RNN_layer(conv_filter[-1], return_sequences=True), merge_mode='ave')(x)
         x = GlobalMaxPooling1D()(x)

@@ -6,7 +6,7 @@ else:
     data_root = Path('D:/Keyword_spot')
 training_audio_data_folder = data_root / 'train/audio'
 training_audio_data = training_audio_data_folder.glob("*/*.wav")
-training_img_data_folder = data_root / 'train/trian_image'
+training_img_data_folder = data_root / 'train/train_image'
 training_img_data_folder.mkdir(parents=True, exist_ok=True)
 test_audio_data_folder = data_root / 'test/audio'
 test_audio_data = test_audio_data_folder.glob("*.wav")
