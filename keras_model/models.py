@@ -18,6 +18,9 @@ class Model(object):
         self.RNN_layer = RNN_layer
         self.RNN_repeat = RNN_repeat
 
+    def build(self, input_layer):
+        pass
+
 
 class ResNetModel(Model):
     def build(self, input_layer):

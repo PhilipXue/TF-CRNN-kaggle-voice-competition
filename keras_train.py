@@ -3,7 +3,7 @@ import argparse
 from keras_model.models import ResNetModel, InceptNetModel
 from keras.preprocessing import image
 from keras.layers import Input
-from config import img_data_folder
+from config import training_img_data_folder
 # parse argument
 parser = argparse.ArgumentParser()
 parser.add_argument('-b', '--batch_size', type=int, default=64)
@@ -18,7 +18,7 @@ learning_rate = args.learning_rate
 circle = args.training_circles
 # specific training set location
 training_data_gen = image.ImageDataGenerator(width_shift_range=0.1)
-training_gen = training_data_gen.flow_from_directory(img_data_folder, class_mode="categorical",
+training_gen = training_data_gen.flow_from_directory(training_img_data_folder, class_mode="categorical",
                                                      target_size=(128, 63),
                                                      batch_size=batch_size,
                                                      color_mode="grayscale")
