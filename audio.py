@@ -24,8 +24,6 @@ def audio_length(audio_filename):
 
     return result
 
-
-# TODO(wakisaka): change sample rate.
 def melspectrogram(audio_file_name, hop_length, offset=0.0, duration=None, sr=22050):
     """Create melspectrogram from audio file.
     1. Load the audio with raw sample rate.
