@@ -5,19 +5,8 @@ import os
 import functools
 from pathlib import Path
 import cv2
-import platform
 import tqdm
-# configuration
-if platform.system() == 'Linux':
-    data_root = Path('/home/philip/data/Keyword_spot')
-else:
-    data_root = Path('D:/Keyword_spot')
-audio_data_folder = data_root / 'train/audio'
-all_audio_data = audio_data_folder.glob("*/*.wav")
-audio_file_num = len(all_audio_data)
-img_data_folder = data_root / 'train/trian_image'
-if not img_data_folder.exists():
-    os.mkdir(img_data_folder)
+from config import data_root, audio_data_folder, img_data_folder, all_audio_data
 
 
 @functools.lru_cache()
