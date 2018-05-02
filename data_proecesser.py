@@ -7,7 +7,7 @@ from pathlib import Path
 import cv2
 import tqdm
 from config import (data_root, training_audio_data_folder,
-                    training_img_data_folder, test_audio_data)
+                    training_img_data_folder, test_audio_data, class_indices)
 
 
 def audio_file_to_mel_spectrum(audio_file_name, hop_length=512, sr=22050):
