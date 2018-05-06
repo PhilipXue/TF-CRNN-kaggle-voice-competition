@@ -1,18 +1,28 @@
 import tensorflow as tf
-from keras_model.models import ResNetModel
+from keras_model.models import ResNetModel, InceptNetModel
 from config import data_root
+from tf_dataset import training_valid_dataset
 
-# TODO: add a mapper from model name to model function
 
-
-def model_func(features, labels, model):
-    K.set_learning_phase(1)
-    pre_logits = ResNetModel().build(features)
-    # logits = tf.layers.Dense(31, activation=None)(pre_logits)
+def model_func(features, labels, model, params):
+    keras_model_mapper = {
+        'resnet': ResNetModel,
+        'inceptnet': InceptNetModel
+    }
+    tf_model_mapper = {}
+    model_name = params.model_name
+    use_keras = model_name in keras_model_mapper
+    if use_keras:
+        K.set_learning_phase(1)
+        model = keras_model_mapper[model_name]
+    else:
+        model = tf_model_mapper[model_name]
+    pre_logits = model(features)
     logits = tf.layers.dense(pre_logits, 31, activation=None)
     predicted_class = tf.argmax(logits, 1)
     if mode == tf.estimator.ModeKeys.PREDICT:
-        K.set_learning_phase(0)
+        if use_keras:
+            K.set_learning_phase(0)
         predictions = {
             'class': predicted_class,
             'prob': tf.nn.softmax(logits),
@@ -33,17 +43,6 @@ def model_func(features, labels, model):
         mode, loss=total_loss, eval_metric_ops=eval_metric_ops)
 
 
-def train_estimator(model_name, batch_size, train_steps, image_size):
-    model_path = data_root / 'models' / model_name
-    model_path.mkdir(exist_ok=True, parents=True)
-    estimator_config = tf.estimator.RunConfig(
-        model_dir=model_dir, save_summary_steps=50, log_step_count_steps=1000)
-    estimator = tf.estimator.Estimator(
-        model_fn=model_func, config=estimator_config)
-    experiment = tf.contrib.learn.Experiment(
-        model_estimator, dataset.train_input_fn, dataset.test_input_fn, train_steps=train_steps)
-    experiment.train_and_evaluate()
-
 if __name__ == "__miain__":
     parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
     parser.add_argument('-m', '--model_name', type=str, default='test')
@@ -56,5 +55,17 @@ if __name__ == "__miain__":
 
     args = parser.parse_args()
     tf.logging.set_verbosity(args.verbose)
-    train_estimator(args.model_name, args.batch_size,
-                    args.train_steps, args.image_size)
+    model_path = data_root / 'models' / args.model_name
+    model_path.mkdir(exist_ok=True, parents=True)
+
+    estimator_config = tf.estimator.RunConfig(
+        model_dir=model_dir, save_summary_steps=50, log_step_count_steps=1000)
+    estimator_params = {
+        'model_name': args.model_name
+    }
+    estimator = tf.estimator.Estimator(
+        model_fn=model_func, config=estimator_config, params=estimator_params)
+    dataset = training_valid_dataset(args.batch_size, args.image_size)
+    experiment = tf.contrib.learn.Experiment(
+        model_estimator, dataset.training_input_fn, dataset.test_input_fn, train_steps=args.train_steps)
+    experiment.train_and_evaluate()
