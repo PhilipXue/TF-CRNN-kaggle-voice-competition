@@ -1,16 +1,17 @@
 import tensorflow as tf
+import argparse
 from keras_model.models import ResNetModel, InceptNetModel
 from config import data_root
 from tf_dataset import training_valid_dataset
 
 
-def model_func(features, labels, model, params):
+def model_func(features, labels, params):
     keras_model_mapper = {
         'resnet': ResNetModel,
         'inceptnet': InceptNetModel
     }
     tf_model_mapper = {}
-    model_name = params.model_name
+    model_name = params['model_name']
     use_keras = model_name in keras_model_mapper
     if use_keras:
         K.set_learning_phase(1)
@@ -38,12 +39,12 @@ def model_func(features, labels, model, params):
             total_loss, global_step=tf.train.get_global_step())
         return tf.estimator.EstimatorSpec(mode, loss=total_loss, train_op=train_op)
     eval_metric_ops = {'accuracy': tf.metrics.accuracy(
-        labels=labels, predictions=predicted_class)
+        labels=labels, predictions=predicted_class)}
     return tf.estimator.EstimatorSpec(
         mode, loss=total_loss, eval_metric_ops=eval_metric_ops)
 
 
-if __name__ == "__miain__":
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
     parser.add_argument('-m', '--model_name', type=str, default='test')
     parser.add_argument('-b', '--batch_size', type=int, default=64)
@@ -59,7 +60,7 @@ if __name__ == "__miain__":
     model_path.mkdir(exist_ok=True, parents=True)
 
     estimator_config = tf.estimator.RunConfig(
-        model_dir=model_dir, save_summary_steps=50, log_step_count_steps=1000)
+        model_dir=model_path, save_summary_steps=50, log_step_count_steps=1000)
     estimator_params = {
         'model_name': args.model_name
     }
@@ -67,5 +68,5 @@ if __name__ == "__miain__":
         model_fn=model_func, config=estimator_config, params=estimator_params)
     dataset = training_valid_dataset(args.batch_size, args.image_size)
     experiment = tf.contrib.learn.Experiment(
-        model_estimator, dataset.training_input_fn, dataset.test_input_fn, train_steps=args.train_steps)
+        estimator, dataset.training_input_fn, dataset.test_input_fn, train_steps=args.train_steps)
     experiment.train_and_evaluate()

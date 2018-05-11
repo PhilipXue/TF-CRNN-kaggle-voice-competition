@@ -1,6 +1,6 @@
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
-from config import test_image_data_folder
+from config import test_image_data_folder, training_img_data_folder
 
 
 def decode_img(file_name, label):
@@ -44,18 +44,18 @@ def create_valid_dataset(img, label, batch_size):
 
 
 class training_valid_dataset(object):
-    def __init__(self, batch_size, image_size):
+    def __init__(self, batch_size, image_size, valid_split=0.1, random_seed=42):
         self.batch_size = batch_size
         self.image_size = image_size
-        training_img = training_img_data_folder.glob('*.jpg')
-        training_label = map(get_label_from_filename, training_img)
+        training_img = list(training_img_data_folder.glob('*/*.jpg'))
+        training_label = list(map(get_label_from_filename, training_img))
         self.training_img, self.test_img, self.training_label, self.test_label = train_test_split(
             training_img, training_label, test_size=valid_split, random_state=random_seed)
 
-    def training_input_func(self):
+    def training_input_fn(self):
         return create_train_dataset(self.training_img, self.training_label, self.batch_size).repeat()
 
-    def test_input_func(self):
+    def test_input_fn(self):
         return create_valid_dataset(self.test_img, self.test_label, self.batch_size)
 
 
@@ -65,7 +65,7 @@ class test_dataset(object):
         self.image_size = image_size
         self.test_img = test_image_data_folder.glob('*.jpg')
 
-    def test_input_func(self):
+    def test_input_fn(self):
         dataset = tf.data.Dataset.from_tensor_slices(
             self.test_img)
         dataset = dataset.map(decode_img_test, num_parallel_calls=num_parallel_calls).prefetch(
