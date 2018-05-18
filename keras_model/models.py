@@ -13,11 +13,10 @@ conv_filter = [8, 16, 32, 64, 128, 256]
 
 
 class Model(object):
-    def __init__(self, input_layer, RNN_repeat=2, RNN_layer=GRU, attention=False):
+    def __init__(self, RNN_repeat=2, RNN_layer=GRU, attention=False):
         self.RNN_layer = RNN_layer
         self.RNN_repeat = RNN_repeat
         self.attention = attention
-        return self.build(input_layer)
 
     def build(self, input_layer):
         pass
