@@ -19,3 +19,6 @@ class_indices = {'bed': 0, 'bird': 1, 'cat': 2, 'dog': 3, 'down': 4,
                  'off': 15, 'on': 16, 'one': 17, 'right': 18, 'seven': 19,
                  'sheila': 20, 'silence': 21, 'six': 22, 'stop': 23, 'three': 24,
                  'tree': 25, 'two': 26, 'up': 27, 'wow': 28, 'yes': 29, 'zero': 30}
+
+preprocess_size = (128, 72)
+image_size = (128, 63, 1)
