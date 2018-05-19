@@ -6,7 +6,7 @@ import functools
 from pathlib import Path
 import cv2
 import tqdm
-from config import (data_root, training_audio_data_folder,
+from config import (data_root, training_audio_data,
                     training_img_data_folder, test_audio_data, class_indices)
 
 
@@ -15,7 +15,7 @@ def audio_file_to_mel_spectrum(audio_file_name, hop_length=512, sr=22050):
     Get an audio fiel its file name and convert it into two dimensions np array
     '''
     y, ori_sr = librosa.load(audio_file_name, sr=None)
-    y = librosa.core.resample(cut_y, orig_sr=ori_sr, target_sr=sr)
+    y = librosa.core.resample(y, orig_sr=ori_sr, target_sr=sr)
     mel = librosa.feature.melspectrogram(
         y=y, sr=sr, hop_length=hop_length)
     db = librosa.power_to_db(mel, ref=np.min)
@@ -34,12 +34,11 @@ def process_data_and_save(audio_files, training):
         if training:
             category = audio_file_name.parent.name
             img_category_folder = training_img_data_folder / category
-            if not img_folder.exists():
-                os.mkdir(img_category_folder)
+            img_category_folder.mkdir(parents=True, exist_ok=True)
         else:
             img_category_folder = test_image_data_folder
         img_filename = img_category_folder / img_file
-        cv2.imwrite(img_filename, db_img)
+        cv2.imwrite(str(img_filename), db_img)
 
 
 if __name__ == '__main__':
