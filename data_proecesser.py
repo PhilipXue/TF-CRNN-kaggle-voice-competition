@@ -12,7 +12,7 @@ from config import (data_root, training_audio_data,
 
 def audio_file_to_mel_spectrum(audio_file_name, hop_length=512, sr=22050):
     '''
-    Get an audio fiel its file name and convert it into two dimensions np array
+    Get an audio file its file name and convert it into two dimensions np array
     '''
     y, ori_sr = librosa.load(audio_file_name, sr=None)
     y = librosa.core.resample(y, orig_sr=ori_sr, target_sr=sr)
