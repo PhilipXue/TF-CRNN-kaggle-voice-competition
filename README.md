@@ -15,11 +15,11 @@ opencv
 ```
 ## Usage
 ### Data precess
-I used librosa to do the audio-spetrum transformation and opencv to handle image data.
+I used librosa to do the audio-spectrum transformation and opencv to handle image data.
 Modify the data root in `config.py` to your position that holds the data and run `data_preprocessor.py`
 ### Training with keras
-`keras_train.py` uses keras pipeline to train. It's very simple and straight forward.
-You can directly config the training hyper-parameters from command line.
+`keras_train.py` uses keras pipeline to train. It's very simple and straightforward.
+You can directly config the training hyper-parameters from the command line.
 ### Training with tensorflow
-`tensorflow_training.py` uses use tf.data to consume data,and use tf.data tf.Estimator API to construct models and  train. It reuses the model construct in keras directly, but by using tensorflow it provides eaiser way to costum loss function (making multi-task training possible) and the natively paralised data input pipline provider higher GPU usage and efficiency.
-As the keras training script, the hyper parameter is configurable through command line arguments
+`tensorflow_training.py` uses use tf.data to consume data, and use tf.data tf.Estimator API to construct models and train. It reuses the model construct in keras directly, but by using tensorflow it provides easier way to custom loss function (making multi-task training possible) and the natively paralyzed data input pipeline provider higher GPU usage and efficiency.
+As the keras training script, the hyperparameters are configurable through command line arguments
